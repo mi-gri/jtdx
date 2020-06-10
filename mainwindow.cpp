@@ -3345,8 +3345,10 @@ void MainWindow::process_Auto()
       case QsoHistory::FIN: {
         if (m_singleshot) 
           autoStopTx("FIN, end of QSO, Singleshot ");
-        else if (m_config.autolog())
+        else if (m_config.autolog()) {
           autoStopTx("FIN, end of QSO, Autolog ");
+	  if (m_autoTx && m_autoseq && !m_lockTxFreq) {writeToALLTXT ("Halt Tx triggered, Automode active"); enableTx_mode(true); } // Test of Automode
+	}	
         else if (m_lastloggedcall != m_hisCall)
           autoStopTx("FIN, end of QSO, Call not logged ");
         else
