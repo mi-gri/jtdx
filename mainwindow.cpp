@@ -3119,6 +3119,7 @@ void MainWindow::process_Auto()
 {
   int count = 0;
   int prio = 0;
+  int priocount = (m_config.nAnswerCQCounter() + 10);
   bool counters = true;
   bool counters2 = true;
   m_status = QsoHistory::NONE;
@@ -3175,6 +3176,19 @@ void MainWindow::process_Auto()
       m_status = QsoHistory::NONE;
       if (m_singleshot)
         counters = false;
+    } else if ((m_status == QsoHistory::RCQ || m_status == QsoHistory::SCALL || (m_status == QsoHistory::SREPORT && m_skipTx1 && !m_houndMode)) && m_config.answerCQCount() &&
+        ((prio > 1 && prio < 5) || prio > 16 || m_strictdirCQ) && ((!m_transmitting && priocount <= count) || (m_transmitting && priocount < count) || m_reply_other)) {
+      clearDX (" cleared, RCQ/SCALL/SREPORT count reached - high priority"); //High Priority Counter
+      if (m_reply_other)
+          counters2 = false;
+      else
+          m_counter = m_config.nAnswerCQCounter();
+      count = m_qsoHistory.reset_count(hisCall);
+      hisCall = m_hisCall;
+      grid = m_hisGrid;
+      m_status = QsoHistory::NONE;
+      if (m_singleshot)
+        counters = false;	    
     } else if ((m_status == QsoHistory::RCALL || (m_status == QsoHistory::SREPORT && !m_skipTx1)) && m_config.answerInCallCount() && 
         ((!m_transmitting && m_config.nAnswerInCallCounter() <= count) || (m_transmitting && m_config.nAnswerInCallCounter() < count)  || m_reply_other)) {
       clearDX (" cleared, RCALL/SREPORT count reached");
