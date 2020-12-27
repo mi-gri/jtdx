@@ -49,8 +49,8 @@ void EQSL::upload(QString const& eqsl_username, QString const& eqsl_passwd, QStr
     myadif+="<PROGRAMID:4>JTDX<EOH><APP_EQSL_QTH_NICKNAME:" + QString::number(eqsl_nickname.length()) + ">" + eqsl_nickname;
     myadif+="<CALL:" + QString::number(call.length()) + ">" + call;
     myadif+="<MODE:"  + QString::number(mode.length()) + ">" + mode;
-    myadif+="<QSO_DATE:8>" + QSO_date_on.date().toString("yyyyMMdd");;
-    myadif+="<TIME_ON:4>" + QSO_date_on.time().toString("hhmm");;
+    myadif+="<QSO_DATE:8>" + QSO_date_on.date().toString("yyyyMMdd");
+    myadif+="<TIME_ON:4>" + QSO_date_on.time().toString("hhmm");
     myadif+="<RST_SENT:" + QString::number(rpt_sent.length()) + ">" + rpt_sent;
     myadif+="<BAND:" + QString::number(band.length()) + ">" + band;
     if(eqslcomments!="") myadif+="<QSLMSG:" + QString::number(eqslcomments.length()) + ">" + eqslcomments;
@@ -80,10 +80,12 @@ void EQSL::networkReply(QNetworkReply *reply)
 
 void EQSL::work()
 {
-    if (QNetworkAccessManager::Accessible != networkManager->networkAccessible ()) {
-      // try and recover network access for QNAM
-      networkManager->setNetworkAccessible (QNetworkAccessManager::Accessible);
-    }
+#if QT_VERSION < QT_VERSION_CHECK (5, 15, 0)
+      if (QNetworkAccessManager::Accessible != networkManager->networkAccessible ()) {
+        // try and recover network access for QNAM
+        networkManager->setNetworkAccessible (QNetworkAccessManager::Accessible);
+      }
+#endif
     m_in_progress = true;
     QUrl url(EqslUrl);
     QUrlQuery query;

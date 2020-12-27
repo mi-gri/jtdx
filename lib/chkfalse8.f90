@@ -49,7 +49,7 @@ subroutine chkfalse8(msg37,i3,n3,nbadcrc,iaptype)
     if(i3.eq.4) then
       islash=index(msg37,'/')
       if(islash.le.0) then
-        callsign=trim(msg37(ispc1+1:)); nlencall=len_trim(callsign); ispccall=index(callsign,' ')
+        callsign=trim(msg37(ispc1+1:)); nlencall=len_trim(callsign); if(nlencall.lt.1) return; ispccall=index(callsign,' ')
 ! CQ 9D6T0GA4 Z space inside callsign of any length: protocol violation, or last char is digit
         if(ispccall.lt.nlencall .or. callsign(nlencall:nlencall).lt.':') then; nbadcrc=1; msg37=''; return; endif
       else
@@ -205,6 +205,10 @@ subroutine chkfalse8(msg37,i3,n3,nbadcrc,iaptype)
 ! i3=3 n3=1 '8Z7TLB JQ0OTZ 589 02'
 ! i3=0 n3=3 'CE3NTP 4C2DWN 5E ONE'
   if(((i3.eq.1 .or. i3.eq.3) .and. index(msg37,' R ').le.0 .and. index(msg37,'/').le.0) .or. (i3.eq.0 .and. n3.eq.3)) then
+! some exceptions, may be checked for valid grid
+! <...> DJ9KM JO40
+! <...> ON6DSL R-05
+    if(msg37(1:2).eq.'<.') return
     ispc1=index(msg37,' '); ispc2=index(msg37((ispc1+1):),' ')+ispc1
     if(ispc1.gt.3 .and. ispc2.gt.7) then
       call_a=msg37(1:ispc1-1); call_b=msg37(ispc1+1:ispc2-1)
@@ -219,6 +223,7 @@ subroutine chkfalse8(msg37,i3,n3,nbadcrc,iaptype)
     ibrace1=index(msg37,'<.')
     if(index(msg37,'<.').gt.4) then
       callsign=''; callsign=msg37(1:ibrace1-2); islash=index(callsign,'/'); nlencall=len_trim(callsign)
+      if(nlencall.lt.1) return
 ! i3=4 n3=2 '6397X6JN637 <...> RRR' 
 ! 'R 5QCDOIY9 <...> RR73'
       if(index(trim(callsign),' ').gt.0 .or. (islash.lt.1 .and. callsign(nlencall:nlencall).lt.':')) then
